@@ -1,0 +1,333 @@
+#include<iostream>
+using namespace std;
+
+struct Request {
+    int reqID;
+    int priority;
+    int time;
+};
+
+class Stack{
+    public:
+        int* arr;
+        int top;
+        int space;
+
+    Stack(int s){
+        space=s;
+        arr=new int[space];
+        top=-1;
+
+    }
+
+    bool isEmpty(){
+        return top==-1;
+    }
+    bool isFull(){
+        return top==space-1;
+    }
+    void push(int d){
+        if(isFull()){
+            cout<<"Stack is Full "<<endl;
+            
+        }
+        else{
+            arr[++top]=d;
+        }
+    }
+    int pop(){
+        if(isEmpty()){
+            cout<<"Stack id empty "<<endl;
+        
+        }
+        else{
+            return arr[top--];
+        }
+    }
+
+    void print(){
+        if(isEmpty()){
+            cout<<"Stack is Empty"<<endl;
+           
+        }
+        else{
+            for(int i=top;i>=0;i--){
+                cout<<arr[i]<<" ";
+            }
+        }
+        cout<<endl;
+    }
+};
+
+class queue{
+    public:
+    int* arr;
+    int front;
+    int rear;
+    int size;
+
+    queue(int s){
+        size=s;
+        arr=new int[size];
+        front=rear=-1;
+    }
+    
+    bool isEmpty(){
+        return front==-1 || front > rear;
+    }
+
+    bool isFull(){
+        return front==size-1;
+    }
+
+    void enqueue(int d){
+        if(isEmpty()){
+            front=0;
+            
+        }
+        arr[++rear]=d;    
+    }
+
+    int dequeue(){
+        if(isEmpty()){
+            return -1;
+        }
+        return arr[front++];    
+    }
+
+    void print(){
+        if(isEmpty()){
+            cout<<"Queue is Empty"<<endl;
+        }
+        else{
+            for(int i=front;i<=rear;i++){
+                cout<<arr[i]<<" ";
+            }
+        }
+    }
+};
+
+class DLLNode{
+    public:
+    int data;
+    DLLNode* left;
+    DLLNode* right;
+
+    DLLNode(int d){
+        this->data=d;
+        this->left=this->right=NULL;
+    }
+};
+
+class DoublyLinkedList{
+    public:
+    DLLNode* head;
+    DLLNode* tail;
+
+    DoublyLinkedList(){head=tail=NULL;}
+
+    void insertAtTail(int d){
+    DLLNode* newNode=new DLLNode(d);
+    if(head==NULL){
+        head=tail=newNode;
+    }
+    else{
+        tail->right=newNode;
+        newNode->left=tail;
+        tail=newNode;
+    }
+    }
+
+    void print(){
+        DLLNode*temp=head;
+        DLLNode*pump=tail;
+        if(head==NULL){
+            cout<<"DLL is Empty";
+        }
+        else{
+               cout<<endl<<"Forward"<<endl;
+                while(temp!=NULL){
+                cout<<temp->data<<" ";
+                temp=temp->right;
+                }
+
+                cout<<endl<<"Backward"<<endl;
+                while(pump!=NULL){
+                cout<<pump->data<<" ";
+                pump=pump->left;
+                }   
+        }
+    }
+
+    void deleteNodeById(int reqID){
+        DLLNode*temp=head;
+        while(temp!=NULL && temp->data!=reqID){
+            temp=temp->right;
+
+        }
+        if(temp==NULL){
+            return;
+        }
+        if(temp->left!=NULL) temp->left->right=temp->right;
+        else head=head->right;
+        
+        if(temp->right!=NULL) temp->right->left=temp->left;
+        else tail=tail->left;
+
+        delete temp;
+
+    }
+
+     //In C++, conditions are read from left to right. If temp falls off the end of the list and becomes NULL, the computer first reads temp->data. Because temp is NULL, it has no data. The computer instantly panics and throws a Segmentation Fault.
+};
+
+class HashNode{
+    public:
+    int status;
+    int reqID;
+
+    HashNode(){
+        reqID=-1;
+        status=0;  // 1-occupied 2-delete 0-empty
+    }
+};
+
+class HashTable{
+    public:
+    HashNode* table;
+    int size;
+
+    HashTable(int s){
+        size=s;
+        table=new HashNode[size];
+    }
+
+    void insert(int Id){
+        int index=Id%size;
+
+        while(table[index].status==1){
+            index=(index+1)%size;
+        }
+
+        table[index].reqID=Id;
+        table[index].status = 1;
+
+    }
+
+    void print(){
+        cout << endl<<"--- Hash Table ---" << endl;
+        for(int i=0;i<size;i++){
+            cout << "[" << i << "]: ";
+            if(table[i].status==1){
+                cout << table[i].reqID;
+            }
+            else if(table[i].status==2){
+                cout << "DELETED";
+            }
+            else cout << "EMPTY";
+            cout << endl;
+        }
+    }
+
+    void deletekey(int id){
+        int index=id % size;
+        while(table[index].status!=0){
+            if(table[index].status==1 && table[index].reqID==id){
+                table[index].status=2;
+                cout << "Deleted ID " << id << " from Hash Table." << endl;
+                return;
+            }
+            index=(index+1)%size;
+        }
+        cout << "ID " << id << " not found!" << endl;  
+    }
+};
+
+
+int main(){
+    int n;
+    cout<<"Enter n: "<<endl;
+    cin>>n;
+
+    Request* arr=new Request[n];
+    cout<<"Enter "<<n<<" Lines( reqID priority time)"<<endl;
+    for (int i=0;i<n;i++){
+        cin>>arr[i].reqID>>arr[i].priority>>arr[i].time;
+    }
+
+    // Insertion sort
+
+    for(int i=0;i<n;i++){
+        Request key=arr[i];
+        int j=i-1;
+
+        while(j>=0 && ((arr[j].priority>key.priority) || (arr[j].priority==key.priority && arr[j].time>key.time))){
+
+            arr[j+1]=arr[j];
+            j--;
+        }
+        arr[j+1]=key;
+    }
+
+    cout<<"Sorted input are "<<endl;
+    for(int i=0;i<n;i++){
+        cout<<arr[i].reqID<<" "<<arr[i].priority<<" "<<arr[i].time<<endl;
+    }
+
+    Stack s(n);
+    queue q(n);
+    HashTable ht(n);
+    DoublyLinkedList dll;
+    for(int i=0;i<n;i++){
+        if(arr[i].priority==1){
+            s.push(arr[i].reqID);
+        }
+        else{
+            q.enqueue(arr[i].reqID);
+        }
+        }
+    
+    cout<<"Processed Student"<<endl;
+
+    int* processed_order=new int[n];
+    int processed_index=0;
+    
+    int current_order;
+    while(!s.isEmpty() || !q.isEmpty()){
+        
+        if(!s.isEmpty()){
+            current_order=s.pop();
+            dll.insertAtTail(current_order);
+            ht.insert(current_order);
+        }
+        else{
+            current_order=q.dequeue();
+            dll.insertAtTail(current_order);
+            ht.insert(current_order);
+        }
+        processed_order[processed_index++]=current_order;
+        
+
+        cout << "Process: " << current_order << " | Stack: ";
+        s.print();
+
+        cout << " | Queue: ";
+        q.print();
+        cout << endl;
+    }
+
+    // int p=s.space;
+
+    dll.print();
+
+    int no;
+    cout<<endl<<"Enter reqID to delete from DLL"<<endl;
+    cin>>no;
+    dll.deleteNodeById(no);
+    dll.print();
+    ht.print();
+    ht.deletekey(111);
+    ht.print();
+
+}
+
