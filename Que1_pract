@@ -243,6 +243,85 @@ class HashTable{
     }
 };
 
+class BSTNode{
+    public:
+    int reqId;
+    BSTNode* left;
+    BSTNode* right;
+
+    BSTNode(int id){
+        reqId=id;
+        left=right=NULL;
+    }
+};
+
+class BST{
+    public:
+    BSTNode* root;
+
+    BST(){
+        root=NULL;
+    }
+    BSTNode* BSTinsertion(BSTNode* root,int id){
+        if(root==NULL){
+            BSTNode* newNode=new BSTNode(id);
+            return newNode;
+        }
+        else if(id>root->reqId){
+            root->right=BSTinsertion(root->right,id);
+        }
+        else{
+            root->left=BSTinsertion(root->left,id);
+        }
+        return root;   //
+    }
+
+    void print_preorder(BSTNode* root){
+      if(root==NULL){
+        return;
+      }
+      else{
+        cout<<root->reqId<<" ";
+        print_preorder(root->left);
+        print_preorder(root->right);
+      }
+    }
+
+    void print_postorder(BSTNode* root){
+      if(root==NULL){
+        return;
+      }
+      else{
+        print_postorder(root->left);
+        print_postorder(root->right);
+        cout<<root->reqId<<" ";
+      }
+    }
+
+    void print_inorder(BSTNode* root){
+      if(root==NULL){
+        return;
+      }
+      else{
+        print_inorder(root->left);
+        cout<<root->reqId<<" ";
+        print_inorder(root->right);
+      }
+    }
+
+    void print(){
+        cout<<"Preorder"<<endl;
+        print_preorder(root);
+        cout<<endl;
+        cout<<"Inorder"<<endl;
+        print_inorder(root);
+        cout<<endl;
+        cout<<"Postorder"<<endl;
+        print_postorder(root);
+    }
+
+    
+};
 
 int main(){
     int n;
@@ -277,6 +356,7 @@ int main(){
     Stack s(n);
     queue q(n);
     HashTable ht(n);
+    BST bst;
     DoublyLinkedList dll;
     for(int i=0;i<n;i++){
         if(arr[i].priority==1){
@@ -291,7 +371,6 @@ int main(){
 
     int* processed_order=new int[n];
     int processed_index=0;
-    
     int current_order;
     while(!s.isEmpty() || !q.isEmpty()){
         
@@ -299,11 +378,13 @@ int main(){
             current_order=s.pop();
             dll.insertAtTail(current_order);
             ht.insert(current_order);
+            bst.root=bst.BSTinsertion(bst.root,current_order);
         }
         else{
             current_order=q.dequeue();
             dll.insertAtTail(current_order);
             ht.insert(current_order);
+            bst.root=bst.BSTinsertion(bst.root,current_order);
         }
         processed_order[processed_index++]=current_order;
         
@@ -328,6 +409,6 @@ int main(){
     ht.print();
     ht.deletekey(111);
     ht.print();
-
+    bst.print();
 }
 
