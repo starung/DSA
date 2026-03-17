@@ -1,13 +1,12 @@
 #include<iostream>
 using namespace std;
 
-struct ticket{
+struct Ticket{
+    int ticketID;
     int type;
     int time;
-    int ticket_id;
-    int counter_no;
+    int counterNo;
 };
-
 class stack{
     public:
     int*arr;
@@ -25,16 +24,17 @@ class stack{
     bool isFull(){
         return top==size-1;
     }
-    void push(int d){
+    void push(int id){
         if(isFull()){
-            cout<<"Stack OverFlow"<<endl;
+            cout<<"Full";
         }
-        arr[++top]=d;
+        else{
+            arr[++top]=id;
+        }
     }
     int pop(){
         if(isEmpty()){
-            cout<<"Stack: Empty  ";
-            return -1;
+            cout<<" Empty ";
         }
         else{
             return arr[top--];
@@ -42,14 +42,12 @@ class stack{
     }
     void print(){
         if(isEmpty()){
-            cout<<"Stack: Empty  | ";
+            cout<<" Empty ";
         }
         else{
-            cout<<"Stack: ";
-            for(int i=0;i<=top;i++){
+            for(int i=top;i>=0;i--){
                 cout<<arr[i]<<" ";
             }
-            cout<<" | ";
         }
     }
 };
@@ -66,129 +64,132 @@ class queue{
         top=front=-1;
     }
     bool isEmpty(){
-        return front==-1 || front>top ;
+        return front==-1 || front>top;
     }
     bool isFull(){
         return top==size-1;
     }
-    void enqueue(int d){
+    void enqueue(int id){
         if(isFull()){
-            cout<<"Queue is Full"<<endl;
+            cout<<"Full";
             return;
         }
-        if(front==-1){
+        else if(isEmpty()){
             front=0;
         }
-        arr[++top]=d;
-
+        arr[++top]=id;   
     }
     int dequeue(){
         if(isEmpty()){
-            cout<<"Empty"<<endl;
-            return -1;
+            cout<<" Empty ";
         }
         else{
             return arr[front++];
         }
-        
     }
     void print(){
         if(isEmpty()){
-            cout<<"Queue: Empty"<<endl;
-            return;
+            cout<<" Empty ";
         }
         else{
-            cout<<"Queue: ";
             for(int i=front;i<=top;i++){
                 cout<<arr[i]<<" ";
             }
         }
-        
     }
 };
-class cirLLNode{
-    public:
-    int counter;
-    int ticket[10]; 
-    int count;  //no of tickets stored
-    cirLLNode*next;
-
-    cirLLNode(int id){
-
-    }
-};
-class htNode{
+class hashNode{
     public:
     int reqId;
-    int status;  //0 empty 1 occupied 2 deleted
-
-    htNode(){
+    int status;  //0-empty ,1-occupied ,2-deleted
+    
+    hashNode(){
         reqId=-1;
         status=0;
     }
 };
 class ht{
     public:
-    htNode*table;
+    hashNode*table;
     int size;
 
     ht(){
         size=10;
-        table=new htNode[size];
+        table=new hashNode[size];
     }
-
     void insert(int id){
+        int count=0;
         int index=id%size;
-        while(table[index].status==1){
+        while(table[index].status==1 && count<size){
             index=(index+1)%size;
+            count++;
         }
-        table[index].reqId=id;
-        table[index].status=1;
+        if(count<size){
+            table[index].reqId=id;
+            table[index].status=1;
+        }
     }
-    void search(int id){
-        cout<<"HASH SEARCH RESULTS :"<<endl;
+    void search_helper(int id){
         int index=id%size;
-        int probe=1;
+        int probe=0;
         for(int i=0;i<size;i++){
+            probe++;
+            if(table[index].status==0){
+                break;
+            }
+
             if(table[index].status==1 && table[index].reqId==id){
                 cout<< "Search "<<id<<": Found at Index "<<index<<" ,Probes : "<<probe<<endl;
                 return;
             }
-            probe++;
             index=(index+1)%size;
         }
         cout<<"Not found"<<", Probes : "<<probe<<endl;
     }
-    void deleteById(int id){
-        int index=id%size;
-        int start=index;
-        if(table[index].status==1){
-            while(table[index].status==1 && table[index].reqId!=id){
-            index=(index+1)%size;
+    void search(){
+        cout<<endl<<endl<<"Enter q ( number of hash searches ):"<<endl;
+        int q;
+        cin>>q;
+        cout<<"Enter "<<q<<" search keys : key1 key2 ..."<<endl;
+        int keys[q];
+        for(int i=0;i<q;i++){
+            cin>>keys[i];
         }
-        table[index].status=2;
-        table[index].reqId=-1;
-        }
-        else{
-            cout<<"Not Found"<<endl;
+        cout<<endl<<endl<<"HASH SEARCH RESULTS :"<<endl;
+        for(int i=0;i<q;i++){
+            search_helper(keys[i]);
         }
     }
-
     void print(){
-        cout<<"FINAL HASH TABLE :"<<endl;
+        cout<<endl<<"FINAL HASH TABLE :"<<endl;
         for(int i=0;i<size;i++){
-            cout<<"["<<i<<"] ";
+            cout<<i<<" : ";
             if(table[i].status==1){
-                 cout<<table[i].reqId<<endl;
+                cout<<table[i].reqId<<endl;
             }
             else if(table[i].status==0){
-                cout<<"empty"<<endl;
+                cout<<"EMPTY"<<endl;
             }
             else if(table[i].status==2){
-                cout<<"deleted"<<endl;
+                cout<<"DELETED"<<endl;
             }
-           
         }
+    }
+    void deleteById(int id){
+        int index=id%size;
+       if(table[index].status==1){
+         while(table[index].status==1 && table[index].reqId!=id){
+            index=(index+1)%size;
+        }
+        index[table].reqId=-1;
+        index[table].status=2;
+
+        print();        
+       }
+
+       else{
+        cout<<" Not Found "<<endl;
+       }
     }
 };
 class bstNode{
@@ -196,30 +197,29 @@ class bstNode{
     int reqId;
     bstNode*left;
     bstNode*right;
-
-    bstNode(int d){
-        reqId=d;
+    bstNode(int id){
+        reqId=id;
         left=right=NULL;
     }
 };
 class bst{
     public:
     bstNode*root;
-
     bst(){
         root=NULL;
     }
     bstNode* insert(bstNode*root ,int id){
-        bstNode* newNode=new bstNode(id);
+        bstNode*newNode=new bstNode(id);
         if(root==NULL){
             root=newNode;
         }
-        else if(root->reqId<id){
+        else if(id<root->reqId){
             root->left=insert(root->left,id);
         }
-        else if(root->reqId>id){
+        else{
             root->right=insert(root->right,id);
         }
+        return root;
     }
     void preorder(bstNode*root){
         if(root==NULL){
@@ -230,7 +230,7 @@ class bst{
             preorder(root->left);
             preorder(root->right);
         }
-        
+  
     }
     void inorder(bstNode*root){
         if(root==NULL){
@@ -255,32 +255,29 @@ class bst{
         
     }
     void print(){
-        cout<<"BST TRAVERSALS :"<<endl;
+        cout<<endl<<endl<<"BST TRAVERSALS :"<<endl;
         cout<<"Preorder :";
         preorder(root);
-        cout<<endl;
-        cout<<"Postorder : ";
-        postorder(root);
-        cout<<endl;
-        cout<<"Inorder :";
+        cout<<endl<<"Inorder :";
         inorder(root);
+        cout<<endl<<"Postorder :";
+        postorder(root);
     }
-};
 
+};
 int main(){
     cout<<"Enter n ( number of tickets ) :"<<endl;
     int n;
     cin>>n;
-    ticket*arr=new ticket[n];
-    cout<<"Enter ticket id , type , time , Counter_no "<<endl;
+    cout<<"Enter "<<n<<" tickets ( ticketID type time counterNo ) :"<<endl;
+    Ticket*arr=new Ticket[n];
     for(int i=0;i<n;i++){
-        cin>>arr[i].ticket_id>>arr[i].type>>arr[i].time>>arr[i].counter_no;
+        cin>>arr[i].ticketID>>arr[i].type>>arr[i].time>>arr[i].counterNo;
     }
-    
-    for(int i=1;i<n;i++){
-        ticket key=arr[i];
+    for(int i=0;i<n;i++){
+        Ticket key=arr[i];
         int j=i-1;
-        while(j>=0 && ((key.type<arr[j].type) || (key.type==arr[j].type && key.time<arr[j].time) || (key.type==arr[j].type && key.time==arr[j].time && key.ticket_id<arr[j].ticket_id))){
+        while(j>=0 && ((arr[j].type>key.type) || (arr[j].type==key.type && arr[j].time>key.time) || (arr[j].type==key.type && arr[j].time==key.time && arr[j].ticketID>key.ticketID))){
             arr[j+1]=arr[j];
             j--;
         }
@@ -290,42 +287,45 @@ int main(){
     queue q(n);
     ht ht;
     bst bst;
-    cout<<"Sorted tickets"<<endl;
+    cout<<endl<<"SORTED TICKETS :"<<endl;
     for(int i=0;i<n;i++){
-        cout<<arr[i].ticket_id<<" "<<arr[i].type<<" "<<arr[i].time<<" "<<arr[i].counter_no<<endl;
-    }
-    for(int i=0;i<n;i++){
+        cout<<arr[i].ticketID<<" "<<arr[i].type<<" "<<arr[i].time<<arr[i].counterNo<<endl;
         if(arr[i].type==1){
-            s.push(arr[i].ticket_id);
+            s.push(arr[i].ticketID);
         }
         else{
-            q.enqueue(arr[i].ticket_id);
+            q.enqueue(arr[i].ticketID);
         }
     }
-    cout<<endl<<"DISPATCH TRACE :"<<endl;
-    for(int i=0;i<n;i++){
-        if(!s.isEmpty()){
-            int processed_order=s.pop();
-            ht.insert(processed_order);
-            bst.root=bst.insert(bst.root,processed_order);
-            cout<<endl<<"Serve : "<<processed_order<<" | ";
+    int trace[n];
+    int i=0;
+    cout<<endl<<"PROCESSING TRACE :"<<endl;
+    while(!s.isEmpty() || !q.isEmpty()){
+            if(!s.isEmpty()){
+            int process=s.pop();
+            trace[i]=process;
+            cout<<"Serve : "<<process<<"  | Stack : ";
             s.print();
+            cout<<" | Queue : ";
             q.print();
+            cout<<endl;
         }
         else{
-            int processed_order=q.dequeue();
-            ht.insert(processed_order);
-            bst.root=bst.insert(bst.root,processed_order);
-            cout<<endl<<"Serve : "<<processed_order<<" ";
+            int process=q.dequeue();
+            trace[i]=process;
+            cout<<"Serve : "<<process<<"  | Stack : ";
             s.print();
+            cout<<" | Queue : ";
             q.print();
+            cout<<endl;
         }
+        i++;
+        }
+        for(int i=0;i<n;i++){
+        ht.insert(trace[i]);
+        bst.root=bst.insert(bst.root,trace[i]);
     }
-
-    ht.print();
-    ht.search(99);
+    ht.search();
     ht.deleteById(205);
-    ht.print();
     bst.print();
-
 }
