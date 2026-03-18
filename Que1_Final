@@ -262,21 +262,18 @@ class ht{
             }
         }
     }
-    void deleteById(int id){
-        int index=id%size;
-       if(table[index].status==1){
-         while(table[index].status==1 && table[index].reqId!=id){
-            index=(index+1)%size;
+    void deleteById(int id) {
+    int index = id % size;
+    int count = 0;
+    while (table[index].status != 0 && count < size) {
+        if (table[index].status == 1 && table[index].reqId == id) {
+            table[index].reqId = -1;
+            table[index].status = 2; 
+            return;
         }
-        index[table].reqId=-1;
-        index[table].status=2;
-
-        print();        
-       }
-
-       else{
-        cout<<" Not Found "<<endl;
-       }
+        index = (index + 1) % size;
+        count++;
+    }
     }
 };
 class bstNode{
