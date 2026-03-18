@@ -192,6 +192,90 @@ class ht{
        }
     }
 };
+
+class Counter {
+public:
+    int counterID;
+    int assignedTickets[10]; // Max capacity is n=10 
+    int ticketCount;         // Number of tickets currently held
+    Counter* next;
+
+    Counter(int id) {
+        counterID = id;
+        ticketCount = 0;
+        next = NULL;
+    }
+};
+class cll{
+public:
+    Counter* head;
+    Counter* currentPointer; // Starts at Counter 1 
+    int totalK;              // Number of counters (k)
+
+    cll(int k) {
+        totalK = k;
+        head = NULL;
+        currentPointer = NULL;
+
+        if (k <= 0) {
+            return;
+        }
+
+        Counter* tail = NULL;
+        for (int i = 1; i <= k; i++) {
+            Counter* newNode = new Counter(i);
+            if (head == NULL) {
+                head = newNode;
+            } 
+            else {
+                tail->next = newNode;
+            }
+            tail = newNode;
+        }
+
+        if (tail != NULL) {
+            tail->next = head;
+        }
+
+        currentPointer = head;
+    }
+
+    // Part C.1 & C.2: Append ticket and move pointer round-robin [cite: 91, 92]
+    void insert(int ticketID) {
+        if (currentPointer != NULL) {
+            // Append ticketID to the current counter [cite: 91]
+            currentPointer->assignedTickets[currentPointer->ticketCount] = ticketID;
+            currentPointer->ticketCount++;
+
+            // Move the pointer to the next counter node 
+            currentPointer = currentPointer->next;
+        }
+    }
+
+    // Part C.3: Print the final counter logs [cite: 93, 94]
+    void print() {
+        cout << "CIRCULAR COUNTER LOG :" << endl; // Required heading [cite: 94]
+        Counter* temp = head;
+
+        for (int i = 0; i < totalK; i++) {
+            cout << "Counter " << temp->counterID << ": ";
+
+            if (temp->ticketCount == 0) {
+                cout << "EMPTY"; // Print EMPTY if no tickets assigned 
+            } else {
+                for (int j = 0; j < temp->ticketCount; j++) {
+                    cout << temp->assignedTickets[j];
+                    // Space-separated with no trailing space 
+                    if (j < temp->ticketCount - 1) {
+                        cout << " ";
+                    }
+                }
+            }
+            cout << endl;
+            temp = temp->next; // Move to next for traversal [cite: 93]
+        }
+    }
+};
 class bstNode{
     public:
     int reqId;
@@ -287,6 +371,7 @@ int main(){
     queue q(n);
     ht ht;
     bst bst;
+    cll cll(3);
     cout<<endl<<"SORTED TICKETS :"<<endl;
     for(int i=0;i<n;i++){
         cout<<arr[i].ticketID<<" "<<arr[i].type<<" "<<arr[i].time<<arr[i].counterNo<<endl;
@@ -323,9 +408,11 @@ int main(){
         }
         for(int i=0;i<n;i++){
         ht.insert(trace[i]);
+        cll.insert(trace[i]);
         bst.root=bst.insert(bst.root,trace[i]);
     }
     ht.search();
     ht.deleteById(205);
+    cll.print();
     bst.print();
 }
